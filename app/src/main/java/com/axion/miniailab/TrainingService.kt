@@ -46,7 +46,7 @@ class TrainingService : Service() {
                 getSharedPreferences("training",MODE_PRIVATE).edit().putString("last_model",out.absolutePath).putInt("last_steps",result.steps).putFloat("last_loss",result.loss.toFloat()).apply()
                 DatasetDb(this@TrainingService).saveModel(UUID.randomUUID().toString(), "model-${System.currentTimeMillis()}", out, result.steps, result.loss)
                 updateNotification(if(stop.get())"Training dihentikan · ${result.steps} langkah" else "Training selesai · ${result.steps} langkah",100)
-                sendBroadcast(Intent(ACTION_FINISHED).setPackage(packageName).putExtra("path",out.absolutePath).putInt("steps",result.steps).putFloat("loss",result.loss.toFloat()).putBoolean("stopped",stop.get()))
+                sendBroadcast(Intent(ACTION_FINISHED).setPackage(packageName).putExtra("path",out.absolutePath).putExtra("steps",result.steps).putExtra("loss",result.loss.toFloat()).putExtra("stopped",stop.get()))
             } catch(e:Exception) { updateNotification("Training gagal: ${e.message ?: "error"}",0);sendBroadcast(Intent(ACTION_FINISHED).setPackage(packageName).putExtra("error",e.message ?: "Training gagal")) }
             finally { try{lock?.let{if(it.isHeld)it.release()}}catch(_:Exception){};lock=null;stopSelf() }
         }
